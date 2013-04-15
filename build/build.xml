@@ -1,0 +1,49 @@
+<project name="distro.build" default="build" basedir="./" xmlns:antcontrib="antlib:net.sf.antcontrib">
+
+	<loadproperties srcfile="build.properties"/>
+	<import file="${cfdistro.build.file}"/>
+
+	<target name="build" depends="cfdistro.build">
+		<mapping physical="@src.dir@/Hoth" virtual="/Hoth"/>
+		<echo file="${src.dir}/Hoth/test/unit/HttpAntRunner.cfc"><![CDATA[<cfcomponent extends="mxunit.runner.HttpAntRunner"></cfcomponent>]]></echo>
+		<mapping physical="@war.target.dir@/WEB-INF/lib/railo-server" virtual="/WEB-INF/lib/railo-server"/>
+	</target>	
+
+	<target name="build.mvn.release" depends="project.update, build, mxunit.tests.run">
+	    <property name="mvn.repo.dest" value="local" />
+	    <property name="mvn.repo.dest" value="remote" />
+	    <property name="mvn.repo.id" value="mvn.repo.${mvn.repo.dest}" />
+	    <property name="maven.repo.local" location="${cfdistro.basedir}/artifacts" />
+		<mvn-repo id="mvn.repo.local" url="file://${maven.repo.local}/" />
+	   	<property name="mvn.type" value="release" />
+
+	   	<delete file="${dist.dir}/hoth.zip" />
+	   	<delete file="${dist.dir}/hoth-all.zip" />
+		<zip destfile="${dist.dir}/hoth.zip" basedir="${src.dir}" excludes="Hoth/tests/** Hoth/lib/** Hoth/snippets/** Hoth/examples/**" />
+		<zip destfile="${dist.dir}/hoth-all.zip" basedir="${src.dir}" includes="Hoth/**" />
+
+		<pom-and-deploy pomid="hoth.pom" packaging="zip" artifact="${dist.dir}/hoth.zip"
+		 groupId="org.riaforge" artifactId="hoth" version="1.0" name="hoth"/>
+		<pom-and-deploy pomid="hoth.pom" packaging="zip" artifact="${dist.dir}/hoth-all.zip"
+		 groupId="org.riaforge" artifactId="hoth-all" version="1.0" name="hoth"/>
+		
+	 	<!--  create an extension -->
+		<delete dir="${basedir}/extensionbase/" />
+		<mkdir dir="${basedir}/extensionbase/" />
+		<copy todir="${basedir}/extensionbase/applications/Hoth">
+			<fileset dir="${src.dir}/Hoth" />
+		</copy>
+		<antcontrib:runtarget target="extension.build" />
+		<delete dir="${basedir}/extensionbase/" />
+	
+        <!-- add the extension as well -->
+		<mvn-put artifact="${extension.dist}/${extension.archive}"
+			packaging="zip" repoId="${mvn.repo.id}" groupId="cfml.extensions"
+			artifactId="hoth" version="${extension.version}" />
+
+	</target>
+
+
+
+		
+</project>
