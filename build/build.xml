@@ -19,8 +19,8 @@
 
 	   	<delete file="${dist.dir}/hoth.zip" />
 	   	<delete file="${dist.dir}/hoth-all.zip" />
-		<zip destfile="${dist.dir}/hoth.zip" basedir="${src.dir}" excludes="Hoth/tests/** Hoth/lib/** Hoth/snippets/** Hoth/examples/**" />
-		<zip destfile="${dist.dir}/hoth-all.zip" basedir="${src.dir}" includes="Hoth/**" />
+		<zip destfile="${dist.dir}/hoth.zip" basedir="${src.dir}/Hoth" excludes="tests/** lib/** snippets/** examples/**" />
+		<zip destfile="${dist.dir}/hoth-all.zip" basedir="${src.dir}/Hoth" />
 
 		<pom-and-deploy pomid="hoth.pom" packaging="zip" artifact="${dist.dir}/hoth.zip"
 		 groupId="org.riaforge" artifactId="hoth" version="1.0" name="hoth"/>
