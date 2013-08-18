@@ -5,11 +5,17 @@
 
 	<target name="build" depends="cfdistro.build">
 		<mapping physical="@src.dir@/Hoth" virtual="/Hoth"/>
-		<echo file="${src.dir}/Hoth/test/unit/HttpAntRunner.cfc"><![CDATA[<cfcomponent extends="mxunit.runner.HttpAntRunner"></cfcomponent>]]></echo>
 		<mapping physical="@war.target.dir@/WEB-INF/lib/railo-server" virtual="/WEB-INF/lib/railo-server"/>
-	</target>	
+	</target>
 
-	<target name="build.mvn.release" depends="project.update, build, mxunit.tests.run">
+	<target name="build.test" depends="build">
+		<dependency groupId="org.coldbox" artifactId="mockbox" version="3.7.0" mapping="/mockbox" />
+		<echo file="${src.dir}/Hoth/test/unit/MockBox.cfc"><![CDATA[<cfcomponent extends="mockbox.system.testing.MockBox"></cfcomponent>]]></echo>
+		<echo file="${src.dir}/Hoth/test/unit/HttpAntRunner.cfc"><![CDATA[<cfcomponent extends="mxunit.runner.HttpAntRunner"></cfcomponent>]]></echo>
+		<antcontrib:runtarget target="mxunit.tests.run" />
+	</target>
+
+	<target name="build.mvn.release" depends="project.update, build.test">
 	    <property name="mvn.repo.dest" value="local" />
 	    <property name="mvn.repo.dest" value="remote" />
 	    <property name="mvn.repo.id" value="mvn.repo.${mvn.repo.dest}" />
